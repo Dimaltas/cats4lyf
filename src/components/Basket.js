@@ -39,7 +39,9 @@ import RemoveIcon from "@material-ui/icons/Remove";
 
 export default function App() {
 const [itemCount, setItemCount] = React.useState(0);
-
+const addHandler = () =>{
+         setItemCount(itemCount +1)
+     }
 return (
 <div>
   <h4>Add to basket</h4>
@@ -57,7 +59,7 @@ return (
       </Button> */}
       <Button id="add"
         onClick={() => {
-          setItemCount(itemCount + 1);
+          addHandler()
         }}
       >
         {" "}
