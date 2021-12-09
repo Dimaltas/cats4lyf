@@ -7,9 +7,17 @@ Switch,
 Route,
 Link
 } from "react-router-dom";
-import Basket from "./components/Basket";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Badge from "@material-ui/core/Badge";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import Button from "@material-ui/core/Button";
+import AddIcon from "@material-ui/icons/Add";
+// import Basket from "./components/Basket";
+
+const faker = require('faker');
 
 const App = () =>{
+    const [basket,setBasket]=useState([])
     const [sale,setSale] = useState("")
     const [loading,setLoading] = useState(false)
     const [error,setError] = useState({
@@ -26,10 +34,19 @@ const App = () =>{
         const data = await response.json()
         setSale(data)
         setLoading(false)
+        const updateData = await fakeDataHandler(data)
+        setSale(data)
+        setLoading(false)
         }catch (error) {
         setError({error:true,message:error.message})
         }
         
+    }
+    const fakeDataHandler = (data) =>{
+        data.map((cat)=>{
+            cat["name"] = faker.name.firstName()
+            cat["price"] = faker.commerce.price()
+        })
     }
     useEffect(()=>{
         getter()
@@ -52,13 +69,15 @@ const App = () =>{
         return (
         <div className="cats">
         <h1 className="header">Cats For Sale</h1>
-        <Cat sale={sale}/>
+        <Cat setBasket={setBasket} basket={basket} sale={sale}/>
     </div>
     )
     }
     function Checkout(){
         return(
-            <h2>Basket</h2>
+            <div>
+            <Basket basket={basket} setBasket={setBasket}/>
+            </div>
         )
     }
     return(
@@ -104,66 +123,81 @@ const App = () =>{
     )
 }
 
-const Cat = ({sale}) => {
-    const [cat,setCat] = useState("")
-    const catS=()=>{
-        setCat(sale)
-    }
-    const randomPrice = () =>{
-        let price = Math.floor(Math.random()*200)
-        return(
-            price
-        )
-    }
-    useEffect(()=>{
-        catS()
-    },[])
-    useEffect(()=>{
-        randomPrice()
-    },[])
-    if(!cat){
-        return null
+const Cat = ({sale, setBasket, basket}) => {
+    const [itemCount, setItemCount] = React.useState(0);
+    const addHandler = () =>{
+         setItemCount(itemCount +1)
+     }
+    const updateBasket = (cat) =>{
+        let stored = [...basket]
+        stored.push(cat)
+        setBasket(stored)
     }
     if(!sale){
         return null
     }
     return(
         <div className="catt">
-            {cat.map((img,index)=>{
+            {sale.map((cat,index)=>{
             return( 
                 <div>
-                <img key={index} src={img.url}/>
-                <h2>Price: £{randomPrice()}</h2>
-                <Basket></Basket>
-                
+                    <img key={index} src={cat.url}/>
+                    <div>
+                        <h4>Add to basket</h4>
+                        <div>
+                            <Badge color="secondary" badgeContent={itemCount}>
+                                <ShoppingCartIcon />{" "}
+                            </Badge>
+                            <ButtonGroup>
+                            <Button id="add"
+                                onClick={() => {updateBasket(cat)
+                                }}>
+                                {" "}
+                                <AddIcon fontSize="small" />
+                            </Button>
+                            </ButtonGroup>
+                        </div>
+                    </div>
                 </div>
-            )
-            })} 
+            )})} 
         </div>
     )
 }
-// const Basket = ({storedCart}) => {
-//     const [cart, setCart] = useState([])
-//     const addHandler = () =>{
-//         let storedCart = [...cart]
-//         storedCart.push(setCart)
-//         setCart(storedCart)
-//     }
-//     const deleteHandler = (index) =>{
-//         let storedCart = [...cart]
-//         storedCart.splice(index,1)
-//         setCart(storedCart)
-//     }
-// return(
-//     <div>
-//     <h1>Basket</h1>
-//     <button type="button" onClick = {addHandler}>+</button>
-//     {cart && 
-//     cart.map((index) =>{
-//         return (<div key={index} value = "item">
-//         <button onClick = {() => deleteHandler(index)}>-</button>
-//         </div>)
-//     })}
-//     </div> )
-// }
+
+const Basket = ({basket,setBasket}) => {
+    const deleteHandler = (index) =>{
+        let storedCart = [...basket]
+        storedCart.splice(index,1)
+        setBasket(storedCart)
+    }
+return(
+    <div>
+    <h1>Basket</h1>
+    {basket && 
+    basket.map((cat,index) =>{
+        return (<div key={index} value = "item">
+            <img src={cat.url}/>
+        <button onClick = {() => deleteHandler(index)}>-</button>
+        </div>)
+    })}
+    </div> )
+}
+
+
+
 export default App;
+
+    // return(
+    //     <div className="catt">
+    //         {cat.map((img,index)=>{
+    //         return( 
+    //             <div>
+    //             <img key={index} src={img.url}/>
+    //             <h2>Price: £{randomPrice()}</h2>
+    //             <Basket></Basket>
+                
+    //             </div>
+    //         )
+    //         })} 
+    //     </div>
+    // )
