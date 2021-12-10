@@ -7,12 +7,10 @@ Switch,
 Route,
 Link
 } from "react-router-dom";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Badge from "@material-ui/core/Badge";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
-// import Basket from "./components/Basket";
 
 const faker = require('faker');
 
@@ -75,8 +73,11 @@ const App = () =>{
     }
     function Checkout(){
         return(
-            <div>
-            <Basket basket={basket} setBasket={setBasket}/>
+            <div className="Checkout">
+                <div>
+                    <h1>Basket</h1>
+                    <Basket basket={basket} setBasket={setBasket}/>
+                </div>
             </div>
         )
     }
@@ -124,15 +125,17 @@ const App = () =>{
 }
 
 const Cat = ({sale, setBasket, basket}) => {
-    const [itemCount, setItemCount] = React.useState(0);
-    const addHandler = () =>{
-         setItemCount(itemCount +1)
-     }
+    const [itemCount, setItemCount] = useState(0);
+    
     const updateBasket = (cat) =>{
         let stored = [...basket]
         stored.push(cat)
         setBasket(stored)
     }
+    useEffect(()=> {
+        setItemCount(basket.length)
+    },[basket])
+
     if(!sale){
         return null
     }
@@ -144,18 +147,18 @@ const Cat = ({sale, setBasket, basket}) => {
                     <img key={index} src={cat.url}/>
                     <div>
                         <h4>Add to basket</h4>
-                        <div>
-                            <Badge color="secondary" badgeContent={itemCount}>
+                        <Badge color="secondary" badgeContent={itemCount}>
                                 <ShoppingCartIcon />{" "}
-                            </Badge>
-                            <ButtonGroup>
+                        </Badge>
+                        <div>
+                            
                             <Button id="add"
-                                onClick={() => {updateBasket(cat)
-                                }}>
+                                onClick={() =>  updateBasket(cat)}>
                                 {" "}
                                 <AddIcon fontSize="small" />
+                                
                             </Button>
-                            </ButtonGroup>
+                            
                         </div>
                     </div>
                 </div>
@@ -163,7 +166,6 @@ const Cat = ({sale, setBasket, basket}) => {
         </div>
     )
 }
-
 const Basket = ({basket,setBasket}) => {
     const deleteHandler = (index) =>{
         let storedCart = [...basket]
@@ -171,8 +173,7 @@ const Basket = ({basket,setBasket}) => {
         setBasket(storedCart)
     }
 return(
-    <div>
-    <h1>Basket</h1>
+    <div className="catt">
     {basket && 
     basket.map((cat,index) =>{
         return (<div key={index} value = "item">
@@ -182,22 +183,4 @@ return(
     })}
     </div> )
 }
-
-
-
 export default App;
-
-    // return(
-    //     <div className="catt">
-    //         {cat.map((img,index)=>{
-    //         return( 
-    //             <div>
-    //             <img key={index} src={img.url}/>
-    //             <h2>Price: £{randomPrice()}</h2>
-    //             <Basket></Basket>
-                
-    //             </div>
-    //         )
-    //         })} 
-    //     </div>
-    // )
